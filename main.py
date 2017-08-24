@@ -36,7 +36,6 @@ def load_vgg(sess, vgg_path):
     layer3_out = tf.get_default_graph().get_tensor_by_name(vgg_layer3_out_tensor_name)
     layer4_out = tf.get_default_graph().get_tensor_by_name(vgg_layer4_out_tensor_name)
     layer7_out = tf.get_default_graph().get_tensor_by_name(vgg_layer7_out_tensor_name)
-    drop = tf.nn.dropout()
     return input, keep_prob, layer3_out, layer4_out, layer7_out
 tests.test_load_vgg(load_vgg, tf)
 
@@ -50,14 +49,17 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     conv_7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, 1, name="conv_7")
-    layer7_upscaled = tf.layers.conv2d_transpose(conv_7, num_classes, 64, 32, padding='SAME', name="layer7_upscaled")
+    layer7_upscaled = tf.layers.conv2d_transpose(conv_7, num_classes, 4, 2, padding='SAME', name="layer7_upscaled")
 
     conv_4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, 1, name="conv_4")
-    layer4_upscaled = tf.layers.conv2d_transpose(conv_4, num_classes, 32, 16, padding='SAME', name="layer4_upscaled")
+    layer4 = tf.add(conv_4, layer7_upscaled)
+
+    layer4_upscaled = tf.layers.conv2d_transpose(layer4, num_classes, 4, 2, padding='SAME', name="layer4_upscaled")
 
     conv_3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, 1, name="conv_3")
-    layer3_upscaled = tf.layers.conv2d_transpose(conv_3, num_classes, 16, 8, padding='SAME', name="layer3_upscaled")
-    output = tf.add(layer3_upscaled, tf.add(2 * layer4_upscaled, 4 * layer7_upscaled), name="semantic_segmentation_output")
+    layer3 = tf.add(conv_3, layer4_upscaled)
+
+    output = tf.layers.conv2d_transpose(layer3, num_classes, 16, 8, padding='SAME', name="layer3_upscaled")
 
     return output
 tests.test_layers(layers)
@@ -123,7 +125,7 @@ tests.test_train_nn(train_nn)
 def run():
     num_classes = 2
     image_shape = (160, 576)
-    epochs = 150
+    epochs = 30
     batch_size = 16
     learning_rate = 0.001
     data_dir = './data'
