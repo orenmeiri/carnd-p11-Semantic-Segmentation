@@ -1,6 +1,9 @@
 # Semantic Segmentation
+
 ### Introduction
-In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
+
+This is my implementation of Semantic Segmentation project as part of Udacity Self Driving Car Nanodegree.  In this exercise I train a Fully Convolutional Network (FCN) to label each pixel of input image wether it shows part of road or not.
+
 
 ### Setup
 ##### Frameworks and Packages
@@ -12,22 +15,32 @@ Make sure you have the following is installed:
 ##### Dataset
 Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip).  Extract the dataset in the `data` folder.  This will create the folder `data_road` with all the training a test images.
 
-### Start
-##### Implement
-Implement the code in the `main.py` module indicated by the "TODO" comments.
-The comments indicated with "OPTIONAL" tag are not required to complete.
-##### Run
-Run the following command to run the project:
-```
-python main.py
-```
-**Note** If running this in Jupyter Notebook system messages, such as those regarding test status, may appear in the terminal rather than the notebook.
+### Architecture
+The FCW is based on VGG 16 pre-trained network.  FC layers at the end of the graph are removed and instead added following layers:
 
-### Submission
-1. Ensure you've passed all the unit tests.
-2. Ensure you pass all points on [the rubric](https://review.udacity.com/#!/rubrics/989/view).
-3. Submit the following in a zip file.
- - `helper.py`
- - `main.py`
- - `project_tests.py`
- - Newest inference images from `runs` folder
+1. Connect layer 7 convolution output to 1x1 convolution, reducing number of matrix layers to 2
+2. Add deconvolution layer to scale up the matrix.
+3. Introduce skip layers by combining output of convolution layers 3 & 4 with result of step 2 for smoothing out region boundaries
+
+### Results
+Predictions of KITTI test dataset can be found at `runs` folder.
+
+Some (of the better) samples are attached here:
+![alt text](runs/1503828429.800806/um_000006.png "Logo Title Text 1")
+
+![alt text](runs/1503828429.800806/um_000013.png "Logo Title Text 1")
+
+![alt text](runs/1503828429.800806/um_000063.png "Logo Title Text 1")
+
+![alt text](runs/1503828429.800806/um_000072.png "Logo Title Text 1")
+
+![alt text](runs/1503828429.800806/um_000081.png "Logo Title Text 1")
+
+![alt text](runs/1503828429.800806/umm_000008.png "Logo Title Text 1")
+
+![alt text](runs/1503828429.800806/umm_000015.png "Logo Title Text 1")
+
+![alt text](runs/1503828429.800806/umm_000038.png "Logo Title Text 1")
+
+![alt text](runs/1503828429.800806/umm_000083.png "Logo Title Text 1")
+
